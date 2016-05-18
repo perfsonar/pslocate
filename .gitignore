@@ -1,0 +1,8 @@
+# Ignore mac hidden file
+.DS_Store
+# Ignore quilt cache directory
+.pc/
+#ignore python build files
+MANIFEST
+dist/
+*.pyc

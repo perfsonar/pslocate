@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+
+from pslocate.locator import pslocate
+from optparse import OptionParser
+import json
+import socket
+import sys
+
+#constants
+VALID_OUTPUT = [ 'pretty', 'json' ]
+DEFAULT_SERVER = 'perfsonar-dev.es.net'
+
+#Parse options
+parser = OptionParser(usage="usage: %prog [options] hop1 [hop2...]")
+parser.add_option("-o", "--output-format", dest="output_format",
+                  help="format of output. Valid values are %s" % VALID_OUTPUT, 
+                  metavar="OUTPUT", default='pretty')
+parser.add_option("-s", "--server", dest="server",
+                  help="address of lookup service cache to contact", 
+                  metavar="SERVER", default=DEFAULT_SERVER)
+                  
+(options, input_hops) = parser.parse_args()
+if options.output_format not in VALID_OUTPUT:
+    print >> sys.stderr, 'Invalid output format %s' % options['output_format']
+    parser.print_help()
+    sys.exit(1)
+if len(input_hops) == 0:
+    print >> sys.stderr, 'Must provide at least one argument'
+    parser.print_help()
+    sys.exit(1)
+
+#fetch result
+sorted_scores = pslocate([options.server], input_hops)
+
+#output result
+if options.output_format == 'pretty':
+    for hop_num, input_hop in enumerate(input_hops):
+        try:
+            hop_name = socket.gethostbyaddr(input_hop)[0]
+        except:
+            hop_name = input_hop
+        print "%d) %s(%s):" % (hop_num+1, hop_name, input_hop)
+        low_score = -1
+        for score in sorted_scores[input_hop]:
+            if low_score == -1:
+                low_score = int(score['score'])
+            elif low_score != int(score['score']):
+                break
+            try:
+                ep_name = socket.gethostbyaddr(score['address'])[0]
+            except:
+                ep_name = score[0]
+            print "    %s(%s): %d hop(s) away" % (ep_name, score['address'], int(score['score']))
+        print
+else:
+    print json.dumps(sorted_scores)
