@@ -8,7 +8,7 @@ import sys
 
 #constants
 VALID_OUTPUT = [ 'pretty', 'json' ]
-DEFAULT_SERVER = 'perfsonar-dev.es.net'
+DEFAULT_SERVER = 'ps-cache-west.es.net'
 
 #Parse options
 parser = OptionParser(usage="usage: %prog [options] hop1 [hop2...]")
@@ -40,6 +40,9 @@ if options.output_format == 'pretty':
         except:
             hop_name = input_hop
         print "%d) %s(%s):" % (hop_num+1, hop_name, input_hop)
+        if input_hop not in sorted_scores:
+            print "    Unable to determine closest measurement point"
+            continue
         low_score = -1
         for score in sorted_scores[input_hop]:
             if low_score == -1:
