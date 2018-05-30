@@ -7,7 +7,7 @@ Name:			perfsonar-pslocate
 Version:		1.0
 Release:		%{relnum}
 Summary:		perfSONAR Locate Script
-License:		Distributable, see LICENSE
+License:		ASL 2.0
 Group:			Development/Libraries
 URL:			http://www.perfsonar.net
 Source0:		%{name}-%{version}.tar.gz
